@@ -1,0 +1,34 @@
+---
+# Downloads and installs the custom dynamodb_scan_table_facts module
+
+# After executing this playbook, verify that the operation was successful
+# by running:
+#   ansible -m dynamodb_scan_table_facts -a "table_name=TestTable projection_expression=AttributeA simplify=True limit=1" localhost -vvv
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    url_base: https://raw.githubusercontent.com/angrychimp/ansible-module-dynamodb-scan/master/plugins
+  
+  tasks:
+    - name: Make user plugin folders
+      file:
+        path: "~/.ansible/plugins/{{ path }}"
+        state: directory
+        mode: 0775
+      loop:
+        - module_utils/aws
+        - modules/cloud/amazon
+      loop_control:
+        loop_var: path
+    
+    - name: Download module files
+      get_url:
+        dest: "~/.ansible/plugins/{{ file.path }}"
+        url: "{{ file.url }}"
+      loop:
+        - {"path": "module_utils/aws", "url": "{{ url_base }}/module_utils/aws/dynamodb_conditions.py"}
+        - {"path": "modules/cloud/amazon", "url": "{{ url_base }}/modules/cloud/amazon/dynamodb_scan_table_facts.py"}
+      loop_control:
+        loop_var: file
