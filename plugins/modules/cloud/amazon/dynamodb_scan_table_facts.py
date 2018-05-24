@@ -218,13 +218,13 @@ def main():
         args = snake_dict_to_camel_dict(args, True)
         helper = DynamoDbConditionsHelper(module)
         
-        if module.params['filter_expression'] and type(module.params['filter_expression']) is list:
+        if 'filter_expression' in module.params and type(module.params['filter_expression']) is list:
             expression = helper.build_filter_expression()
             args['FilterExpression'] = expression.condition_expression
             args['ExpressionAttributeNames'] = expression.attribute_name_placeholders
             args['ExpressionAttributeValues'] = expression.attribute_value_placeholders
         
-        if args['ProjectionExpression'] and type(args['ProjectionExpression']) is list:
+        if 'ProjectionExpression' in args and type(args['ProjectionExpression']) is list:
             args['ProjectionExpression'] = ", ".join(args['ProjectionExpression'])
         
         result = connection.scan(**args)['Items']
